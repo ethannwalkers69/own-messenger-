@@ -5,76 +5,121 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Kwentuhan</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
+// Jeepney palette: ocean blue body, sun-yellow trim, hibiscus red, leaf green, on deep ink
 tailwind.config = { theme: { extend: {
-  fontFamily: { display: ['"Bricolage Grotesque"', 'system-ui', 'sans-serif'], sans: ['Figtree', 'system-ui', 'sans-serif'] },
-  colors: { ube: { 50: '#F6F4FB', 100: '#E4DEF3', 600: '#5B3FA0', 700: '#4B2E83', 900: '#26173F' }, mango: '#F5B53D' }
+  fontFamily: { display: ['Unbounded', 'system-ui', 'sans-serif'], sans: ['Rubik', 'system-ui', 'sans-serif'] },
+  colors: { ink: '#0A1F3C', ink2: '#14305A', ocean: '#1456D8', oceandk: '#0F3FA6', sun: '#FFC21A', hib: '#E8346B', leaf: '#14A66B', mist: '#A9BDDA', line: '#D9E2EF', paper: '#F2F6FB' }
 } } }
 </script>
 <style type="text/tailwindcss">
   html, body { height: 100%; }
-  body { height: 100dvh; background: #F6F4FB; color: #26173F; }
-  .field { @apply w-full rounded-lg border border-ube-100 bg-white px-3 py-2.5 outline-none focus:border-ube-600 focus:ring-2 focus:ring-ube-600/20; }
+  body { height: 100dvh; background: #F2F6FB; color: #0A1F3C; }
+  .field { @apply w-full rounded-xl border border-line bg-white px-3 py-2.5 outline-none focus:border-ocean focus:ring-2 focus:ring-ocean/25; }
   .lbl { @apply block text-sm font-medium mb-1; }
+  .stripe { height: 8px; background: linear-gradient(90deg, #FFC21A 0 34%, #E8346B 34% 67%, #14A66B 67%); }
+  .btn { @apply rounded-xl bg-ocean hover:bg-oceandk text-white font-semibold px-4 py-2.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sun; }
+  .msg { position: relative; }
+  .acts { display: none; position: absolute; bottom: 100%; z-index: 5; gap: 2px; padding: 3px; margin-bottom: 2px; background: #fff; border: 1px solid #D9E2EF; border-radius: 999px; box-shadow: 0 4px 14px rgba(10,31,60,.18); }
+  .msg.mine .acts { right: 0; } .msg.theirs .acts { left: 0; }
+  .msg:hover .acts, .msg.open .acts { display: flex; }
+  .acts button { width: 30px; height: 30px; border-radius: 999px; font-size: 16px; }
+  .acts button:hover { background: #F2F6FB; }
+  @keyframes flash { 0%,100% { background: transparent; } 30% { background: #FFC21A55; } }
+  .flash { animation: flash 1.2s ease; border-radius: 16px; }
+  @media (prefers-reduced-motion: reduce) { .flash { animation: none; } }
 </style>
 </head>
 <body class="font-sans">
 
 <section id="auth" style="display:none" class="h-full overflow-y-auto md:grid md:grid-cols-2">
-  <div class="hidden md:flex flex-col justify-between bg-ube-900 text-white p-12">
-    <h1 class="font-display text-5xl font-bold">Kwentuhan</h1>
-    <div class="space-y-3 max-w-sm">
-      <p class="bg-ube-600 rounded-2xl rounded-bl-sm px-4 py-3 w-fit">Kumusta? Nakauwi ka na ba?</p>
-      <p class="bg-white text-ube-900 rounded-2xl rounded-br-sm px-4 py-3 w-fit ml-auto">Kakarating lang. Kwentuhan tayo mamaya!</p>
-      <p class="bg-ube-600 rounded-2xl rounded-bl-sm px-4 py-3 w-fit">Sige, tawag ka lang.</p>
+  <div class="hidden md:flex flex-col bg-ink text-white">
+    <div class="stripe"></div>
+    <div class="flex-1 flex flex-col justify-between p-12">
+      <h1 class="font-display text-4xl font-bold">Kwentuhan</h1>
+      <div class="space-y-3 max-w-sm">
+        <p class="bg-ink2 rounded-2xl rounded-bl-sm px-4 py-3 w-fit">Kumusta? Nakauwi ka na ba?</p>
+        <p class="bg-sun text-ink rounded-2xl rounded-br-sm px-4 py-3 w-fit ml-auto">Kakarating lang. Kwentuhan tayo mamaya!</p>
+        <p class="bg-ink2 rounded-2xl rounded-bl-sm px-4 py-3 w-fit">Sige, tawag ka lang.</p>
+      </div>
+      <p class="text-mist text-sm">Chat with the people you know.</p>
     </div>
-    <p class="text-ube-100 text-sm">Chat with the people you know.</p>
   </div>
   <div class="flex items-center justify-center p-6 min-h-full">
     <div class="w-full max-w-sm">
-      <p class="md:hidden font-display text-3xl font-bold text-ube-700 mb-6">Kwentuhan</p>
-      <h1 id="authTitle" class="font-display text-2xl font-semibold mb-5">Log in</h1>
+      <p class="md:hidden font-display text-2xl font-bold text-ocean mb-6">Kwentuhan</p>
+      <h1 id="authTitle" class="font-display text-xl font-medium mb-5">Log in</h1>
       <form id="authForm" class="space-y-4" novalidate>
         <div id="emailWrap"><label class="lbl" for="email">Gmail</label><input id="email" type="email" class="field" placeholder="name@gmail.com" autocomplete="email"></div>
         <div><label id="userLbl" class="lbl" for="username">Username</label><input id="username" class="field" autocomplete="username"></div>
         <div id="lastWrap"><label class="lbl" for="lastName">Last name</label><input id="lastName" class="field" autocomplete="family-name"></div>
         <div><label class="lbl" for="password">Password</label><input id="password" type="password" class="field" autocomplete="current-password"></div>
-        <p id="authError" role="alert" class="text-sm text-red-600 min-h-5"></p>
-        <button id="authBtn" class="w-full rounded-lg bg-ube-700 hover:bg-ube-900 text-white font-semibold py-2.5">Log in</button>
+        <p id="authError" role="alert" class="text-sm text-hib min-h-5"></p>
+        <button id="authBtn" class="btn w-full">Log in</button>
       </form>
-      <button id="toggleAuth" type="button" class="mt-4 text-sm text-ube-700 font-medium">Create an account</button>
+      <button id="toggleAuth" type="button" class="mt-4 text-sm text-ocean font-medium">Create an account</button>
     </div>
   </div>
 </section>
 
 <section id="chat" style="display:none" class="h-full">
-  <aside id="sidebar" class="w-full md:w-80 shrink-0 bg-ube-900 text-white flex flex-col md:flex">
+  <aside id="sidebar" class="w-full md:w-80 shrink-0 bg-ink text-white flex flex-col md:flex">
+    <div class="stripe"></div>
     <div class="p-4 flex items-center justify-between">
-      <span class="font-display text-xl font-bold">Kwentuhan</span>
-      <button id="logoutBtn" class="text-sm text-ube-100 hover:text-white">Log out</button>
+      <span class="font-display text-lg font-bold">Kwentuhan</span>
+      <button id="logoutBtn" class="text-sm text-mist hover:text-white">Log out</button>
     </div>
-    <div id="meBox" class="px-4 pb-3 flex items-center gap-3"></div>
-    <div class="px-4 pb-3"><input id="search" placeholder="Search people" class="w-full rounded-lg bg-white/10 px-3 py-2 text-sm placeholder-ube-100/70 outline-none focus:bg-white/20"></div>
+    <button id="meBox" type="button" class="mx-4 mb-3 p-2 rounded-xl hover:bg-white/10 flex items-center gap-3 text-left" aria-label="Edit your profile"></button>
+    <div class="px-4 pb-3 flex gap-1" role="tablist">
+      <button id="tabPeople" role="tab" class="flex-1 rounded-lg py-1.5 text-sm font-medium">People</button>
+      <button id="tabGroups" role="tab" class="flex-1 rounded-lg py-1.5 text-sm font-medium">Groups</button>
+    </div>
+    <div class="px-4 pb-3 flex gap-2">
+      <input id="search" placeholder="Search" class="flex-1 min-w-0 rounded-xl bg-white/10 px-3 py-2 text-sm placeholder-mist/70 outline-none focus:bg-white/20">
+      <button id="newGroupBtn" type="button" class="hidden rounded-xl bg-sun text-ink text-sm font-semibold px-3">New group</button>
+    </div>
     <ul id="users" class="flex-1 overflow-y-auto"></ul>
   </aside>
-  <main id="main" class="flex-1 min-w-0 flex hidden md:flex flex-col bg-ube-50">
-    <div id="empty" class="flex-1 grid place-items-center p-6 text-center text-ube-700/70">Choose someone to chat with</div>
+
+  <main id="main" class="flex-1 min-w-0 flex hidden md:flex flex-col bg-paper">
+    <div id="empty" class="flex-1 grid place-items-center p-6 text-center text-ink/60">Pick a person or group to start chatting</div>
     <div id="convo" style="display:none" class="flex-1 min-h-0 flex-col">
-      <header class="flex items-center gap-3 p-3 bg-white border-b border-ube-100">
-        <button id="backBtn" class="md:hidden px-2 py-1 text-xl text-ube-700" aria-label="Back">&larr;</button>
-        <div id="peerAvatar"></div>
-        <div class="min-w-0"><p id="peerName" class="font-semibold truncate"></p><p id="peerStatus" class="text-xs text-slate-500"></p></div>
+      <header class="flex items-center gap-3 p-3 bg-white border-b border-line">
+        <button id="backBtn" class="md:hidden px-2 py-1 text-xl text-ocean" aria-label="Back">&larr;</button>
+        <button id="peerBtn" type="button" class="flex items-center gap-3 min-w-0 text-left">
+          <div id="peerAvatar"></div>
+          <div class="min-w-0"><p id="peerName" class="font-semibold truncate"></p><p id="peerStatus" class="text-xs text-ink/60"></p></div>
+        </button>
       </header>
-      <div id="messages" class="flex-1 overflow-y-auto p-4 flex flex-col gap-3"></div>
-      <form id="composer" class="p-3 bg-white border-t border-ube-100 flex gap-2">
+      <div id="messages" class="flex-1 overflow-y-auto p-4 pt-10 flex flex-col gap-4"></div>
+      <p id="typing" class="px-4 h-5 text-xs text-ink/60" aria-live="polite"></p>
+      <div id="replyBar" class="hidden items-center gap-3 px-4 py-2 bg-white border-t border-line">
+        <div class="flex-1 min-w-0 border-l-4 border-sun pl-3">
+          <p class="text-xs font-semibold text-ocean">Replying to <span id="replyName"></span></p>
+          <p id="replyText" class="text-sm truncate text-ink/70"></p>
+        </div>
+        <button id="replyCancel" type="button" class="text-xl text-ink/60 px-2" aria-label="Cancel reply">&times;</button>
+      </div>
+      <div id="imgBar" class="hidden items-center gap-3 px-4 py-2 bg-white border-t border-line">
+        <img id="imgPrev" alt="Photo to send" class="h-14 w-14 rounded-lg object-cover">
+        <p class="flex-1 text-sm text-ink/70">Photo ready to send</p>
+        <button id="imgCancel" type="button" class="text-xl text-ink/60 px-2" aria-label="Remove photo">&times;</button>
+      </div>
+      <form id="composer" class="p-3 bg-white border-t border-line flex gap-2">
+        <button id="attachBtn" type="button" class="rounded-full border border-line px-3 text-lg" aria-label="Attach photo">📎</button>
+        <input id="fileInput" type="file" accept="image/*" class="hidden">
         <input id="msgInput" class="field rounded-full" placeholder="Write a message" autocomplete="off">
-        <button class="rounded-full bg-ube-700 hover:bg-ube-900 text-white font-semibold px-5">Send</button>
+        <button class="btn rounded-full px-5">Send</button>
       </form>
     </div>
   </main>
 </section>
+
+<div id="modal" class="hidden fixed inset-0 z-50 bg-ink/60 items-center justify-center p-4">
+  <div id="modalBox" class="bg-white rounded-2xl p-6 w-full max-w-sm max-h-full overflow-y-auto"></div>
+</div>
 <script src="app.js"></script>
 </body>
 </html>
