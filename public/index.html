@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kwentuhan</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="h-screen bg-stone-100 text-slate-800">
+  <section id="auth" style="display:none" class="h-full place-items-center p-4">
+    <div class="w-full max-w-sm bg-white rounded-xl shadow p-6 space-y-3">
+      <h1 id="authTitle" class="text-2xl font-semibold">Log in</h1>
+      <input id="username" placeholder="Username" autocomplete="username" class="w-full border rounded px-3 py-2">
+      <input id="password" type="password" placeholder="Password" autocomplete="current-password" class="w-full border rounded px-3 py-2">
+      <p id="authError" class="text-red-600 text-sm min-h-5"></p>
+      <button id="authBtn" class="w-full bg-teal-700 hover:bg-teal-800 text-white rounded py-2">Log in</button>
+      <button id="toggleAuth" class="w-full text-sm text-teal-700">Create an account</button>
+    </div>
+  </section>
+
+  <section id="chat" style="display:none" class="h-full">
+    <aside class="w-64 shrink-0 bg-slate-900 text-slate-100 flex flex-col">
+      <div class="p-4 flex items-center justify-between border-b border-slate-700">
+        <span id="me" class="font-medium"></span>
+        <button id="logoutBtn" class="text-sm text-slate-300 hover:text-white">Log out</button>
+      </div>
+      <div class="p-3"><input id="search" placeholder="Search people" class="w-full rounded bg-slate-800 px-3 py-2 text-sm placeholder-slate-400 outline-none"></div>
+      <ul id="users" class="flex-1 overflow-y-auto"></ul>
+    </aside>
+    <main class="flex-1 flex flex-col min-w-0">
+      <header id="peer" class="p-4 bg-white border-b font-medium">Pick someone to chat with</header>
+      <div id="messages" class="flex-1 overflow-y-auto p-4 flex flex-col gap-2"></div>
+      <div id="composer" style="display:none" class="p-3 bg-white border-t gap-2">
+        <input id="msgInput" placeholder="Write a message" class="flex-1 border rounded px-3 py-2">
+        <button id="sendBtn" class="bg-teal-700 hover:bg-teal-800 text-white rounded px-4">Send</button>
+      </div>
+    </main>
+  </section>
+  <script src="app.js"></script>
+</body>
+</html>
