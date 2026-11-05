@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wazzup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = { theme: { extend: {
+  fontFamily: { display: ['"Bricolage Grotesque"', 'system-ui', 'sans-serif'], sans: ['Figtree', 'system-ui', 'sans-serif'] },
+  colors: { ube: { 50: '#F6F4FB', 100: '#E4DEF3', 600: '#5B3FA0', 700: '#4B2E83', 900: '#26173F' }, mango: '#F5B53D' }
+} } }
+</script>
+<style type="text/tailwindcss">
+  html, body { height: 100%; }
+  body { height: 100dvh; background: #F6F4FB; color: #26173F; }
+  .field { @apply w-full rounded-lg border border-ube-100 bg-white px-3 py-2.5 outline-none focus:border-ube-600 focus:ring-2 focus:ring-ube-600/20; }
+  .lbl { @apply block text-sm font-medium mb-1; }
+</style>
+</head>
+<body class="font-sans">
+
+<section id="auth" style="display:none" class="h-full overflow-y-auto md:grid md:grid-cols-2">
+  <div class="hidden md:flex flex-col justify-center gap-10 bg-ube-900 text-white p-12">
+    <div class="space-y-3 max-w-sm">
+      <p class="bg-ube-600 rounded-2xl rounded-bl-sm px-4 py-3 w-fit">Kumusta? Nakauwi ka na ba?</p>
+      <p class="bg-white text-ube-900 rounded-2xl rounded-br-sm px-4 py-3 w-fit ml-auto">Kakarating lang. Usap tayo mamaya!</p>
+      <p class="bg-ube-600 rounded-2xl rounded-bl-sm px-4 py-3 w-fit">Sige, tawag ka lang.</p>
+    </div>
+    <p class="text-ube-100 text-sm">Chat with the people you know.</p>
+  </div>
+  <div class="flex items-center justify-center p-6 min-h-full">
+    <div class="w-full max-w-sm">
+      <h1 id="authTitle" class="font-display text-2xl font-semibold mb-5">Log in</h1>
+      <form id="authForm" class="space-y-4" novalidate>
+        <div id="emailWrap"><label class="lbl" for="email">Gmail</label><input id="email" type="email" class="field" placeholder="name@gmail.com" autocomplete="email"></div>
+        <div><label id="userLbl" class="lbl" for="username">Username</label><input id="username" class="field" autocomplete="username"></div>
+        <div id="lastWrap"><label class="lbl" for="lastName">Last name</label><input id="lastName" class="field" autocomplete="family-name"></div>
+        <div><label class="lbl" for="password">Password</label><input id="password" type="password" class="field" autocomplete="current-password"></div>
+        <p id="authError" role="alert" class="text-sm text-red-600 min-h-5"></p>
+        <button id="authBtn" class="w-full rounded-lg bg-ube-700 hover:bg-ube-900 text-white font-semibold py-2.5">Log in</button>
+      </form>
+      <button id="toggleAuth" type="button" class="mt-4 text-sm text-ube-700 font-medium">Create an account</button>
+    </div>
+  </div>
+</section>
+
+<section id="chat" style="display:none" class="h-full">
+  <aside id="sidebar" class="w-full md:w-80 shrink-0 bg-ube-900 text-white flex flex-col md:flex">
+    <div class="p-4 flex items-center justify-between">
+      <span class="font-display text-xl font-bold flex items-center gap-2"><span data-icon="chat" data-cls="w-6 h-6" class="text-mango"></span>Wazzup</span>
+      <button id="logoutBtn" aria-label="Log out" title="Log out" class="p-2 rounded-lg text-ube-100 hover:text-white hover:bg-white/10"><span data-icon="logout"></span></button>
+    </div>
+    <div id="meBox" class="px-4 pb-3 flex items-center gap-3"></div>
+    <div class="px-4 pb-3 flex gap-2">
+      <div class="relative flex-1 min-w-0"><span data-icon="search" data-cls="w-4 h-4" class="absolute left-3 top-1/2 -translate-y-1/2 text-ube-100/70"></span><input id="search" placeholder="Search" class="w-full rounded-lg bg-white/10 pl-9 pr-3 py-2 text-sm placeholder-ube-100/70 outline-none focus:bg-white/20"></div>
+      <button id="newGroup" aria-label="New group" title="New group" class="rounded-lg bg-mango text-ube-900 px-3 grid place-items-center"><span data-icon="userplus"></span></button>
+    </div>
+    <ul id="list" class="flex-1 overflow-y-auto"></ul>
+  </aside>
+  <main id="main" class="flex-1 min-w-0 flex hidden md:flex flex-col bg-ube-50">
+    <div id="empty" class="flex-1 grid place-items-center p-6 text-center text-ube-700/70"><div class="flex flex-col items-center gap-3"><span data-icon="chat" data-cls="w-14 h-14" class="text-ube-600/40"></span>Choose someone to chat with</div></div>
+    <div id="convo" style="display:none" class="flex-1 min-h-0 flex-col">
+      <header class="flex items-center gap-3 p-3 bg-white border-b border-ube-100">
+        <button id="backBtn" class="md:hidden px-2 py-1 text-xl text-ube-700" aria-label="Back"><span data-icon="back" data-cls="w-6 h-6"></span></button>
+        <div id="peerAvatar"></div>
+        <div class="min-w-0 flex-1"><p id="peerName" class="font-semibold truncate"></p><p id="peerStatus" class="text-xs text-slate-500 truncate"></p></div>
+        <button id="leaveBtn" style="display:none" aria-label="Leave group" title="Leave group" class="p-2 rounded-lg text-red-600 hover:bg-red-50"><span data-icon="logout"></span></button>
+      </header>
+      <div id="messages" class="flex-1 overflow-y-auto p-4 flex flex-col gap-3"></div>
+      <div id="replyBar" style="display:none" class="items-center gap-2 px-3 py-2 bg-ube-100 text-sm">
+        <span data-icon="reply" data-cls="w-4 h-4 shrink-0"></span><span id="replyText" class="flex-1 truncate"></span>
+        <button id="replyCancel" class="px-2 text-ube-700" aria-label="Cancel reply"><span data-icon="x" data-cls="w-4 h-4"></span></button>
+      </div>
+      <form id="composer" class="p-3 bg-white border-t border-ube-100 flex gap-2">
+        <input id="msgInput" class="field rounded-full" placeholder="Write a message" autocomplete="off">
+        <button aria-label="Send" class="rounded-full bg-ube-700 hover:bg-ube-900 text-white w-11 h-11 grid place-items-center shrink-0"><span data-icon="send"></span></button>
+      </form>
+    </div>
+  </main>
+</section>
+
+<div id="groupModal" style="display:none" class="fixed inset-0 z-10 bg-black/50 place-items-center p-4">
+  <form id="groupForm" class="w-full max-w-sm bg-white rounded-xl p-5 space-y-3 max-h-full overflow-y-auto">
+    <h2 class="font-display text-xl font-semibold">New group</h2>
+    <input id="groupName" class="field" placeholder="Group name" maxlength="40">
+    <div id="groupMembers" class="max-h-48 overflow-y-auto"></div>
+    <p id="groupError" class="text-sm text-red-600 min-h-5"></p>
+    <div class="flex gap-2 justify-end">
+      <button type="button" id="groupCancel" class="px-4 py-2 text-ube-700">Cancel</button>
+      <button class="rounded-lg bg-ube-700 hover:bg-ube-900 text-white font-semibold px-4 py-2">Create</button>
+    </div>
+  </form>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
